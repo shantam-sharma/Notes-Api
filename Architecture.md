@@ -34,10 +34,12 @@ Phase 3. Api design
 
 Phase 4. Database design
 - User table
-
+    id , name , email , created at .
+    you should never store raw password
 - Notes table
 
 Phase 5. Project Structure
+```
     notes-api/
     │
     ├── cmd/
@@ -57,5 +59,52 @@ Phase 5. Project Structure
     ├── Dockerfile
     ├── go.mod
     └── .env
+```
 
 Phase 6. Each layer meaning and tasks
+- handlers
+    http only , parse request , validate method , send response
+- services
+    Business Logic (like a brain)
+    signup user , hash password , give id , create note etc.
+- repositories
+    database access only (this layer talks to SQL)
+    insert user , fetch note , delete note.
+
+Phase 7. AUTHENTICATION
+- Sign up flow
+```
+    User sends email/password
+            ↓
+    Server validates input
+            ↓
+    Password gets hashed
+            ↓
+    User stored in DB
+            ↓
+    Success response
+```
+- Log in flow
+```
+    User sends credentials
+            ↓
+    Find user by email
+            ↓
+    Compare password hash
+            ↓
+    Generate JWT token
+            ↓
+    Return token
+```
+- Protected route flow
+```
+    Client sends JWT
+            ↓
+    Middleware validates token
+            ↓
+    Extract user ID
+            ↓
+    Attach user to request context
+            ↓
+    Handler uses authenticated user
+```
