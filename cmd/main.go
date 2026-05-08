@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-	"notes_api/internal"
+	"notes_api/internal/database"
 )
 
 func main() {
 
-	db, err := internal.ConnectDB()
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}

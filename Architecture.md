@@ -37,7 +37,7 @@ Phase 4. Database design
     id , name , email , created at .
     you should never store raw password
 - Notes table
-
+    id, user_id , title , content , created at , created by.
 Phase 5. Project Structure
 ```
     notes-api/
