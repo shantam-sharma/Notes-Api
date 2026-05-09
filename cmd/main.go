@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"notes_api/internal/database"
+	"notes_api/internal/handlers"
 
 	"github.com/joho/godotenv"
 )
@@ -20,4 +22,15 @@ func main() {
 	defer db.Close()
 
 	log.Println("Server starting...")
+
+	authHandler := handlers.AuthHandler{
+		DB: db,
+	}
+
+	http.HandleFunc("/signup", authHandler.Signup)
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
