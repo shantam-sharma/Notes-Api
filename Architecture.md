@@ -108,3 +108,19 @@ Phase 7. AUTHENTICATION
             ↓
     Handler uses authenticated user
 ```
+Phase 8. Login + JWT
+```
+    User logs in
+        ↓
+    Backend verifies credentials
+        ↓
+    Backend creates token
+        ↓
+    Client stores token
+        ↓
+    Future requests send token
+        ↓
+    Backend identifies user
+```
+jwt = json web token (digital id card)
+

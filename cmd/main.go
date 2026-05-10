@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"notes_api/internal/database"
 	"notes_api/internal/handlers"
+	"notes_api/internal/services"
 
 	"github.com/joho/godotenv"
 )
@@ -23,8 +24,12 @@ func main() {
 
 	log.Println("Server starting...")
 
-	authHandler := handlers.AuthHandler{
+	authService := services.AuthService{
 		DB: db,
+	}
+
+	authHandler := handlers.AuthHandler{
+		AuthService: &authService,
 	}
 
 	http.HandleFunc("/signup", authHandler.Signup)
