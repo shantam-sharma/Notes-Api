@@ -1,15 +1,16 @@
 package services
 
 import (
-	"database/sql"
+	"errors"
 	"notes_api/internal/models"
 	"notes_api/internal/repositories"
+	"notes_api/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	DB *sql.DB
+	UserRepo *repositories.UserRepository
 }
 
 func (s *AuthService) Signup(name, email, password string) error {
@@ -28,10 +29,32 @@ func (s *AuthService) Signup(name, email, password string) error {
 		PasswordHash: string(hashedPassword),
 	}
 
-	err = repositories.CreateUser(s.DB, user)
+	err = s.UserRepo.CreateUser(user)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *AuthService) Login(email, password string) (string, error) {
+	user, err := s.UserRepo.GetUserByEmail(email)
+	if err != nil {
+		return "", errors.New("invalid credentials")
+	}
+
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(password),
+	)
+
+	if err != nil {
+		return "", errors.New("invalid credentials")
+	}
+
+	token, err := utils.GenerateJWT(user.ID, user.Email)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
