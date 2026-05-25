@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"notes_api/internal/database"
 	"notes_api/internal/handlers"
+	"notes_api/internal/middleware"
 	"notes_api/internal/repositories"
 	"notes_api/internal/services"
 
@@ -37,6 +38,23 @@ func main() {
 		AuthService: &authService,
 	}
 
+	noteRepo := &repositories.NoteRepository{
+		DB: db,
+	}
+
+	noteService := &services.NoteService{
+		Repo: noteRepo,
+	}
+
+	noteHandler := &handlers.NoteHandler{
+		Service: noteService,
+	}
+	http.Handle(
+		"/notes",
+		middleware.AuthMiddleware(
+			http.HandlerFunc(noteHandler.CreateNote),
+		),
+	)
 	http.HandleFunc("/signup", authHandler.Signup)
 	http.HandleFunc("/login", authHandler.Login)
 

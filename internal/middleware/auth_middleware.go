@@ -72,7 +72,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		// STEP 7 — Extract user_id safely
-		userIDFloat, ok := claims["user_id"].(float64)
+		userIDClaim, exists := claims["user_id"]
+
+		if !exists {
+			http.Error(w, "missing user_id", http.StatusUnauthorized)
+			return
+		}
+
+		userIDFloat, ok := userIDClaim.(float64)
 
 		if !ok {
 			http.Error(w, "invalid user_id", http.StatusUnauthorized)
