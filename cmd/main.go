@@ -9,6 +9,7 @@ import (
 	"notes_api/internal/repositories"
 	"notes_api/internal/services"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -49,16 +50,23 @@ func main() {
 	noteHandler := &handlers.NoteHandler{
 		Service: noteService,
 	}
-	http.Handle(
-		"/notes",
-		middleware.AuthMiddleware(
-			http.HandlerFunc(noteHandler.CreateNote),
-		),
-	)
-	http.HandleFunc("/signup", authHandler.Signup)
-	http.HandleFunc("/login", authHandler.Login)
 
-	err = http.ListenAndServe(":8080", nil)
+	r := chi.NewRouter()
+
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware)
+
+		r.Post("/notes", noteHandler.CreateNote)
+		r.Get("/notes", noteHandler.GetNotes)
+		r.Get("/notes/{id}", noteHandler.GetNoteByID)
+		r.Put("/notes/{id}", noteHandler.UpdateNote)
+		r.Delete("/notes/{id}", noteHandler.DeleteNote)
+	})
+
+	r.Post("/signup", authHandler.Signup)
+	r.Post("/login", authHandler.Login)
+
+	err = http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -6,6 +6,7 @@ import (
 	"notes_api/internal/repositories"
 	"notes_api/internal/utils"
 
+	"github.com/jackc/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,9 +29,15 @@ func (s *AuthService) Signup(name, email, password string) error {
 		Email:        email,
 		PasswordHash: string(hashedPassword),
 	}
-
+	//! important concept to convert generic error into: PostgreSQL-specific error
 	err = s.UserRepo.CreateUser(user)
 	if err != nil {
+		//!checks unique constraint violation
+		pgErr, ok := err.(*pgconn.PgError)
+
+		if ok && pgErr.Code == "23505" {
+			return errors.New("user already exists")
+		}
 		return err
 	}
 

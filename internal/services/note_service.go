@@ -22,3 +22,19 @@ func (s *NoteService) CreateNote(userID int, title, content string) error {
 	}
 	return s.Repo.CreateNote(note)
 }
+
+func (s *NoteService) GetNotesByUserID(userID int) ([]models.Note, error) {
+	return s.Repo.GetNotesByUserID(userID)
+}
+
+func (s *NoteService) GetNoteByID(noteID, userID int) (models.Note, error) {
+	return s.Repo.GetNoteByID(noteID, userID)
+}
+
+func (s *NoteService) UpdateNote(noteID, userID int, title, content string) error {
+	return s.Repo.UpdateNote(noteID, userID, title, content)
+}
+
+func (s *NoteService) DeleteNote(noteID, UserID int) error {
+	return s.Repo.DeleteNote(noteID, UserID)
+}

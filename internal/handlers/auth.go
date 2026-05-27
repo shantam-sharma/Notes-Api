@@ -48,7 +48,12 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		if err.Error() == "user already exists" {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
+
+		http.Error(w, "failed to create user", http.StatusInternalServerError)
 		return
 	}
 	// This Repeates
