@@ -64,7 +64,48 @@ func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	notes, err := h.Service.GetNotesByUserID(userID)
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	page := 1
+	limit := 10
+
+	if pageStr != "" {
+		parsedPage, err := strconv.Atoi(pageStr)
+
+		if err != nil {
+			http.Error(w, "invalid page", http.StatusBadRequest)
+			return
+		}
+		page = parsedPage
+	}
+
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+
+		if err != nil {
+			http.Error(w, "invalid limit", http.StatusBadRequest)
+			return
+		}
+		limit = parsedLimit
+	}
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+
+	if limit > 100 {
+		limit = 100
+	}
+
+	notes, err := h.Service.GetNotesByUserID(
+		userID,
+		page,
+		limit,
+	)
 
 	if err != nil {
 		http.Error(w, "failed to fetch notes", http.StatusInternalServerError)

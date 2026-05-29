@@ -23,8 +23,13 @@ func (s *NoteService) CreateNote(userID int, title, content string) error {
 	return s.Repo.CreateNote(note)
 }
 
-func (s *NoteService) GetNotesByUserID(userID int) ([]models.Note, error) {
-	return s.Repo.GetNotesByUserID(userID)
+func (s *NoteService) GetNotesByUserID(
+	userID int,
+	page int,
+	limit int,
+) ([]models.Note, error) {
+	offset := (page - 1) * limit
+	return s.Repo.GetNotesByUserID(userID, limit, offset)
 }
 
 func (s *NoteService) GetNoteByID(noteID, userID int) (models.Note, error) {

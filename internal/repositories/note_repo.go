@@ -29,14 +29,17 @@ func (r *NoteRepository) CreateNote(note models.Note) error {
 	return nil
 }
 
-func (r *NoteRepository) GetNotesByUserID(userID int) ([]models.Note, error) {
+func (r *NoteRepository) GetNotesByUserID(userID int, limit int, offset int) ([]models.Note, error) {
 	query := `
 		SELECT id, user_id, title, content, created_at, updated_at
 		FROM notes
 		WHERE user_id = $1
+		ORDER BY created_at DESC
+		LIMIT $2
+		OFFSET $3
 	`
 
-	rows, err := r.DB.Query(query, userID)
+	rows, err := r.DB.Query(query, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}

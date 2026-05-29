@@ -124,3 +124,4 @@ Phase 8. Login + JWT
 ```
 jwt = json web token (digital id card)
 
+offset=(page−1)×limit // pagination
