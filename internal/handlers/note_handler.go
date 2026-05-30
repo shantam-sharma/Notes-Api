@@ -40,11 +40,6 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
-	// 3 tasks
-	// Get authenticated user ID from request context.
-	// Middleware stored this after validating JWT.
-	// Get authenticated user ID from request context.
-	// Middleware stored this after validating JWT.
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 	if !ok {
 		utils.WriteError(

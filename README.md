@@ -1,120 +1,113 @@
-# Notes API — Go + PostgreSQL Backend Project
+# Notes API
 
-## Overview
+A RESTful Notes API built with **Go**, **PostgreSQL**, and **JWT Authentication** following a layered backend architecture.
 
-This project is a backend Notes API built using Go and PostgreSQL.
-The goal of the project is not just to build CRUD endpoints, but to deeply understand backend engineering concepts such as:
-
-* API architecture
-* authentication and authorization
-* database design
-* relational data modeling
-* password hashing
-* middleware
-* clean project structure
-* Dockerized development
-* backend best practices
-
-The project is being built incrementally to focus on learning backend development properly instead of copying large tutorials.
+This project was built to learn and implement real-world backend development concepts including authentication, authorization, database design, middleware, pagination, migrations, and clean architecture patterns.
 
 ---
 
-# Tech Stack
+## Features
 
-## Backend
+### Authentication
 
-* Go (Golang)
+* User Signup
+* User Login
+* Password Hashing with bcrypt
+* JWT Token Generation
+* Protected Routes using Middleware
 
-## Database
+### Notes Management
+
+* Create Note
+* Get All Notes
+* Get Note By ID
+* Update Note
+* Delete Note
+
+### Authorization
+
+* Users can only access their own notes
+* Ownership validation on all note operations
+
+### Database
 
 * PostgreSQL
+* Foreign Key Relationships
+* Cascading Deletes
+* Database Migrations
 
-## Database Driver
+### Additional Features
 
-* pgx
-* database/sql
-
-## Authentication
-
-* bcrypt password hashing
-* JWT authentication (in progress)
-
-## Environment Management
-
-* .env configuration
-
-## Planned Infrastructure
-
-* Docker
-* Docker Compose
+* Pagination
+* Structured JSON Responses
+* Layered Architecture
+* Environment Variable Configuration
 
 ---
 
-# Features Implemented
+## Tech Stack
 
-## Database Setup
-
-* Connected Go application to PostgreSQL
-* Implemented DB connection handling
-* Added DB ping verification
-* Added error handling for DB failures
-
----
-
-## Database Schema Design
-
-### Users Table
-
-Fields:
-
-* id
-* name
-* email
-* password_hash
-* created_at
-
-### Notes Table
-
-Fields:
-
-* id
-* user_id
-* title
-* content
-* created_at
-* updated_at
+| Technology     | Purpose                |
+| -------------- | ---------------------- |
+| Go             | Backend Language       |
+| PostgreSQL     | Database               |
+| Chi Router     | HTTP Routing           |
+| JWT            | Authentication         |
+| bcrypt         | Password Hashing       |
+| golang-migrate | Database Migrations    |
+| godotenv       | Environment Management |
 
 ---
 
-## Relational Database Design
-
-Implemented:
-
-* one-to-many relationship between users and notes
-* ownership structure using user_id
-* unique email handling
-
----
-
-## Authentication — Signup
-
-Implemented:
-
-* POST /signup endpoint
-* request body parsing
-* JSON decoding
-* input validation
-* password hashing using bcrypt
-* storing hashed passwords securely
-* user insertion into PostgreSQL
-* proper HTTP status handling
-
----
-
-# Current Project Structure
+## Architecture
 
 ```text
-notes-api/
+Client
+   │
+   ▼
+Handlers
+   │
+   ▼
+Services
+   │
+   ▼
+Repositories
+   │
+   ▼
+PostgreSQL
+```
+
+### Layer Responsibilities
+
+#### Handlers
+
+Responsible for:
+
+* Parsing requests
+* Returning responses
+* HTTP status codes
+
+#### Services
+
+Responsible for:
+
+* Business logic
+* Validation
+* Authentication logic
+
+#### Repositories
+
+Responsible for:
+
+* Database queries
+* PostgreSQL interaction
+
+---
+
+## Project Structure
+
+```text
+Notes-Api/
 │
 ├── cmd/
 │   └── main.go
@@ -122,201 +115,198 @@ notes-api/
 ├── internal/
 │   ├── database/
 │   ├── handlers/
-│   ├── repositories/
 │   ├── middleware/
+│   ├── models/
+│   ├── repositories/
 │   ├── services/
-│   └── models/
+│   └── utils/
 │
 ├── migrations/
 │
 ├── .env
 ├── go.mod
-├── go.sum
 └── README.md
 ```
 
 ---
 
-# Concepts Learned So Far
+## Database Schema
 
-## Backend Architecture
+### Users Table
 
-* separation of concerns
-* layered backend structure
-* handler vs repository responsibilities
-
----
-
-## Database Concepts
-
-* relational databases
-* foreign keys
-* schema design
-* unique constraints
-* ownership relationships
-
----
-
-## Authentication Concepts
-
-* password hashing
-* bcrypt
-* why raw passwords should never be stored
-* request validation
-
----
-
-## Go Backend Development
-
-* package organization
-* database/sql usage
-* pgx driver integration
-* environment variables
-* structured error handling
-
----
-
-# API Endpoints
-
-## Implemented
-
-### Signup
-
-```http
-POST /signup
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
-Request Example:
+### Notes Table
 
-```json
-{
-  "name": "John",
-  "email": "john@example.com",
-  "password": "secret123"
-}
+```sql
+CREATE TABLE notes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
 ```
 
 ---
 
-# Features Currently In Progress
+## API Endpoints
 
-## Login System
+### Authentication
 
-Planned:
-
-* POST /login
-* password verification
-* JWT generation
-* secure authentication flow
+| Method | Endpoint | Description   |
+| ------ | -------- | ------------- |
+| POST   | /signup  | Register User |
+| POST   | /login   | Login User    |
 
 ---
 
-## JWT Authentication
+### Notes
 
-Planned:
-
-* JWT token generation
-* token validation
-* expiration handling
-* authorization middleware
-
----
-
-## Protected Routes
-
-Planned:
-
-* middleware-based route protection
-* authenticated note access
-* user-specific request handling
-
----
-
-## Notes CRUD
-
-Planned:
-
-* create notes
-* get notes
-* update notes
-* delete notes
-
----
-
-## Ownership Authorization
-
-Planned:
-
-* ensure users can only access their own notes
-* secure note querying using user_id
+| Method | Endpoint    | Description    |
+| ------ | ----------- | -------------- |
+| POST   | /notes      | Create Note    |
+| GET    | /notes      | Get User Notes |
+| GET    | /notes/{id} | Get Note By ID |
+| PUT    | /notes/{id} | Update Note    |
+| DELETE | /notes/{id} | Delete Note    |
 
 ---
 
 ## Pagination
 
-Planned:
+Retrieve notes with pagination.
 
-* page and limit query parameters
-* SQL LIMIT/OFFSET usage
-* paginated API responses
+```http
+GET /notes?page=1&limit=10
+```
+
+### Query Parameters
+
+| Parameter | Description    |
+| --------- | -------------- |
+| page      | Page Number    |
+| limit     | Notes Per Page |
 
 ---
 
-## Docker Support
+## Environment Variables
 
-Planned:
+Create a `.env` file:
 
-* Dockerfile
+```env
+DB_URL=<postgres-connection-string>
+JWT_SECRET=<jwt-secret>
+```
+
+---
+
+## Running Locally
+
+### Clone Repository
+
+```bash
+git clone https://github.com/shantam-sharma/Notes-Api.git
+cd Notes-Api
+```
+
+### Install Dependencies
+
+```bash
+go mod tidy
+```
+
+### Configure Environment
+
+Create a `.env` file and add:
+
+```env
+DB_URL=<postgres-connection-string>
+JWT_SECRET=<jwt-secret>
+```
+
+### Run Application
+
+```bash
+go run cmd/main.go
+```
+
+Server starts on:
+
+```text
+http://localhost:8080
+```
+
+---
+
+## Sample Login Response
+
+```json
+{
+  "token": "<jwt-token>"
+}
+```
+
+---
+
+## Sample Error Response
+
+```json
+{
+  "error": "unauthorized"
+}
+```
+
+---
+
+## Concepts Learned
+
+This project demonstrates:
+
+* REST API Design
+* Layered Architecture
+* Repository Pattern
+* JWT Authentication
+* Authorization
+* Middleware
+* PostgreSQL Integration
+* Database Migrations
+* Pagination
+* Error Handling
+* Environment Configuration
+
+---
+
+## Future Improvements
+
+* Docker
 * Docker Compose
-* containerized PostgreSQL
-* reproducible development environment
+* Unit Tests
+* Integration Tests
+* Refresh Tokens
+* Structured Logging
+* CI/CD Pipeline
 
 ---
 
-# Future Improvements
+## Version
 
-## Possible Additions
+Current Release:
 
-* refresh tokens
-* role-based authorization
-* request logging
-* structured logging
-* configuration management
-* API versioning
-* unit testing
-* integration testing
-* SQL migrations
-* rate limiting
-* CI/CD pipeline
-
----
-
-# Learning Goals Behind This Project
-
-This project is being used to learn and practice:
-
-* backend engineering fundamentals
-* production-style API development
-* authentication systems
-* clean architecture
-* relational database design
-* Go backend development
-* debugging and error handling
-* scalable backend structure
-
----
-
-# Project Status
-
-Current Status:
-
-* Database connected
-* Schema designed
-* Signup authentication completed
-* Login + JWT authentication in progress
-
----
-
-# Notes
-
-This project is intentionally being built step-by-step to focus on understanding backend systems deeply instead of relying heavily on tutorials or generated boilerplate.
+```text
+v1.0.0
+```

@@ -70,7 +70,6 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
-	// This Repeates
 	utils.WriteJSON(
 		w,
 		http.StatusCreated,

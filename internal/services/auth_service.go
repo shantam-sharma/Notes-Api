@@ -6,7 +6,7 @@ import (
 	"notes_api/internal/repositories"
 	"notes_api/internal/utils"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,6 +38,7 @@ func (s *AuthService) Signup(name, email, password string) error {
 		if ok && pgErr.Code == "23505" {
 			return errors.New("user already exists")
 		}
+
 		return err
 	}
 
