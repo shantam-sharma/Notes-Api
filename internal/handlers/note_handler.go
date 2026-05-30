@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"notes_api/internal/middleware"
 	"notes_api/internal/services"
+	"notes_api/internal/utils"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -23,12 +24,20 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid request body",
+		)
 		return
 	}
 
 	if req.Title == "" || req.Content == "" {
-		http.Error(w, "title and content are required", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"title and content are required",
+		)
 		return
 	}
 	// 3 tasks
@@ -38,29 +47,42 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	// Middleware stored this after validating JWT.
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		utils.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"unauthorized",
+		)
 		return
 	}
 
 	err = h.Service.CreateNote(userID, req.Title, req.Content)
 	if err != nil {
-		http.Error(w, "failed to create note", http.StatusInternalServerError)
+		utils.WriteError(
+			w,
+			http.StatusInternalServerError,
+			"failed to create note",
+		)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "note created",
-	})
+	utils.WriteJSON(
+		w,
+		http.StatusCreated,
+		map[string]string{
+			"message": "note created",
+		},
+	)
 }
 
 func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 
 	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		utils.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"unauthorized",
+		)
 		return
 	}
 
@@ -74,7 +96,11 @@ func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 		parsedPage, err := strconv.Atoi(pageStr)
 
 		if err != nil {
-			http.Error(w, "invalid page", http.StatusBadRequest)
+			utils.WriteError(
+				w,
+				http.StatusBadRequest,
+				"invalid page",
+			)
 			return
 		}
 		page = parsedPage
@@ -84,7 +110,11 @@ func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 		parsedLimit, err := strconv.Atoi(limitStr)
 
 		if err != nil {
-			http.Error(w, "invalid limit", http.StatusBadRequest)
+			utils.WriteError(
+				w,
+				http.StatusBadRequest,
+				"invalid limit",
+			)
 			return
 		}
 		limit = parsedLimit
@@ -108,19 +138,29 @@ func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, "failed to fetch notes", http.StatusInternalServerError)
+		utils.WriteError(
+			w,
+			http.StatusInternalServerError,
+			"failed to fetch notes",
+		)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(notes)
+	utils.WriteJSON(
+		w,
+		http.StatusOK,
+		notes,
+	)
 }
 
 func (h *NoteHandler) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		utils.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"unauthorized",
+		)
 		return
 	}
 
@@ -129,18 +169,29 @@ func (h *NoteHandler) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 	noteID, err := strconv.Atoi(idParam)
 
 	if err != nil {
-		http.Error(w, "invalid note id", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid note id",
+		)
 		return
 	}
 
 	note, err := h.Service.GetNoteByID(noteID, userID)
 	if err != nil {
-		http.Error(w, "note not found", http.StatusNotFound)
+		utils.WriteError(
+			w,
+			http.StatusNotFound,
+			"note not found",
+		)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	utils.WriteJSON(
+		w,
+		http.StatusOK,
+		note,
+	)
 }
 
 func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
@@ -149,19 +200,31 @@ func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid request body",
+		)
 		return
 	}
 
 	if req.Title == "" || req.Content == "" {
-		http.Error(w, "title and content are required", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"title and content are required",
+		)
 		return
 	}
 
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 
 	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		utils.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"unauthorized",
+		)
 		return
 	}
 	//Gets the "id" value from the URL route.
@@ -171,7 +234,11 @@ func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	noteID, err := strconv.Atoi(idParam)
 
 	if err != nil {
-		http.Error(w, "invalid note id", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid note id",
+		)
 		return
 	}
 
@@ -183,41 +250,60 @@ func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, "note not found", http.StatusNotFound)
+		utils.WriteError(
+			w,
+			http.StatusNotFound,
+			"note not found",
+		)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "note updated successfully",
-	})
+	utils.WriteJSON(
+		w,
+		http.StatusOK,
+		map[string]string{
+			"message": "note updated successfully",
+		},
+	)
 }
 
 func (h *NoteHandler) DeleteNote(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(int)
 
 	if !ok {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		utils.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"unauthorized",
+		)
 		return
 	}
 
 	idParam := chi.URLParam(r, "id")
 	noteID, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid note id", http.StatusBadRequest)
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid note id",
+		)
 		return
 	}
 
 	err = h.Service.DeleteNote(noteID, userID)
 	if err != nil {
-		http.Error(w, "note not found", http.StatusNotFound)
+		utils.WriteError(
+			w,
+			http.StatusNotFound,
+			"note not found",
+		)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "note deleted successfully",
-	})
+	utils.WriteJSON(
+		w,
+		http.StatusOK,
+		map[string]string{
+			"message": "note deleted successfully",
+		},
+	)
 }

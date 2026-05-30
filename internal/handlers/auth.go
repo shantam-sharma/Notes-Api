@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"notes_api/internal/services"
+	"notes_api/internal/utils"
 )
 
 // incoming json structure
@@ -20,8 +21,13 @@ type AuthHandler struct {
 
 // (h *AuthHandler) -> method receiver (this fun belong to auth handler)
 func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
+	// after using chi this is not necesseraly required anymore but we are keeping it for now
 	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		utils.WriteError(
+			w,
+			http.StatusMethodNotAllowed,
+			"method not allowed",
+		)
 		return
 	}
 	// body can contain large data so good practice to close after use
@@ -31,13 +37,13 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
 	// Basic validation
 	if req.Email == "" || req.Name == "" || req.Password == "" {
-		http.Error(w, "All fields are required", http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, "All fields are required")
 		return
 	}
 
@@ -49,20 +55,29 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err.Error() == "user already exists" {
-			http.Error(w, err.Error(), http.StatusConflict)
+			utils.WriteError(
+				w,
+				http.StatusConflict,
+				err.Error(),
+			)
 			return
 		}
 
-		http.Error(w, "failed to create user", http.StatusInternalServerError)
+		utils.WriteError(
+			w,
+			http.StatusInternalServerError,
+			"failed to create user",
+		)
 		return
 	}
 	// This Repeates
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "User created successfully",
-	})
+	utils.WriteJSON(
+		w,
+		http.StatusCreated,
+		map[string]string{
+			"message": "user created successfully",
+		},
+	)
 
 }
 
@@ -73,7 +88,11 @@ type LoginRequest struct {
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		utils.WriteError(
+			w,
+			http.StatusMethodNotAllowed,
+			"method not allowed",
+		)
 		return
 	}
 
@@ -83,12 +102,12 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	if req.Email == "" || req.Password == "" {
-		http.Error(w, "All fields are required", http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, "All fields are required")
 		return
 	}
 
@@ -98,14 +117,15 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		utils.WriteError(w, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": token,
-	})
+	utils.WriteJSON(
+		w,
+		http.StatusOK,
+		map[string]string{
+			"token": token,
+		},
+	)
 }
