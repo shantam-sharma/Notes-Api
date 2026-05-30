@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"notes_api/internal/utils"
 	"os"
 	"strings"
 
@@ -22,7 +23,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 
 		if authHeader == "" {
-			http.Error(w, "missing authorization header", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"missing authorization header",
+			)
 			return
 		}
 
@@ -30,7 +35,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		parts := strings.SplitN(authHeader, " ", 2)
 
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, "invalid authorization format", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"invalid authorization format",
+			)
 			return
 		}
 
@@ -59,7 +68,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		// STEP 5 — Validate Token
 		if err != nil || !token.Valid {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"invalid token",
+			)
 			return
 		}
 
@@ -67,7 +80,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		claims, ok := token.Claims.(jwt.MapClaims)
 
 		if !ok {
-			http.Error(w, "invalid token claims", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"invalid token claims",
+			)
 			return
 		}
 
@@ -75,14 +92,22 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		userIDClaim, exists := claims["user_id"]
 
 		if !exists {
-			http.Error(w, "missing user_id", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"missing user_id",
+			)
 			return
 		}
 
 		userIDFloat, ok := userIDClaim.(float64)
 
 		if !ok {
-			http.Error(w, "invalid user_id", http.StatusUnauthorized)
+			utils.WriteError(
+				w,
+				http.StatusUnauthorized,
+				"invalid user_id",
+			)
 			return
 		}
 
