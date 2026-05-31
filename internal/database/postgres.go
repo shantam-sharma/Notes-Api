@@ -10,6 +10,10 @@ import (
 
 func ConnectDB() (*sql.DB, error) {
 	connStr := os.Getenv("DATABASE_URL")
+
+	if connStr == "" {
+		return nil, fmt.Errorf("DATABASE_URL not set")
+	}
 	//prepare db manager
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
