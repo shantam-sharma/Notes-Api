@@ -1,0 +1,186 @@
+# Task 1 – Containerization: Dockerize a Web Application
+
+---
+
+# Objective
+
+The objective of this task was to containerize a backend web application using Docker and Docker Compose. The application should be able to run inside containers along with its database service.
+
+---
+
+# Project Overview
+
+For this task, I used my existing Notes API project built in Go.
+
+The Notes API is a RESTful backend application that provides:
+
+* User Registration
+* User Authentication using JWT
+* Notes CRUD Operations
+* PostgreSQL Database Integration
+* Database Migrations
+* Pagination Support
+
+The application follows a layered architecture consisting of Handlers, Services, Repositories, and PostgreSQL.
+
+---
+
+# Technologies Used
+
+* Go 1.25
+* PostgreSQL 18
+* Docker
+* Docker Compose
+* JWT Authentication
+* Git & GitHub
+
+---
+
+# Task Requirements
+
+The following requirements were implemented:
+
+* Dockerfile for application containerization
+* Multi-stage Docker build
+* Docker Compose configuration
+* PostgreSQL database container
+* Health checks
+* Persistent storage using Docker volumes
+* Build and run documentation
+
+---
+
+# Dockerfile Configuration
+
+A multi-stage Docker build was implemented.
+
+Build Stage:
+
+* Uses the official Go image
+* Downloads dependencies
+* Compiles the application binary
+
+Runtime Stage:
+
+* Uses Alpine Linux
+* Copies only the compiled binary
+* Produces a lightweight image
+
+Result:
+
+* Initial image size: ~1.5 GB
+* Optimized image size: ~35 MB
+
+---
+
+# Docker Compose Configuration
+
+Services configured:
+
+## API Service
+
+* Builds application image from Dockerfile
+* Exposes port 8080
+* Uses environment variables
+
+## PostgreSQL Service
+
+* PostgreSQL 18 image
+* Exposes database port
+* Persistent storage volume
+* Health check configuration
+
+---
+
+# Commands Used
+
+## Build Docker Image
+
+```bash
+docker build -t notes-api:multistage .
+```
+
+## Run Application
+
+```bash
+docker compose up
+```
+
+## Stop Containers
+
+```bash
+docker compose down
+```
+
+## Rebuild Containers
+
+```bash
+docker compose build --no-cache
+docker compose up
+```
+
+## Verify API Endpoint
+
+```bash
+curl http://localhost:8080/notes
+```
+
+---
+
+# Validation
+
+The following validations were performed:
+
+* Docker image builds successfully
+* PostgreSQL container starts successfully
+* Health checks pass
+* API container connects to PostgreSQL
+* API endpoint is accessible through localhost:8080
+
+---
+
+# Screenshots
+
+## Screenshot 1 – Docker Compose Running
+
+docs/screenshots/docker-compose-up.png
+
+Description:
+
+The screenshot demonstrates successful startup of both PostgreSQL and API containers. Health checks pass and the application establishes a database connection.
+
+---
+
+## Screenshot 2 – API Endpoint Test
+
+docs/screenshots/api-endpoint-test.png
+
+Description:
+
+The screenshot demonstrates successful communication with the API endpoint through the exposed Docker port.
+
+---
+
+# Repository Information
+
+GitHub Repository:
+
+https://github.com/shantam-sharma/Notes-Api
+
+Release Tag:
+
+v1.1.0
+
+---
+
+# Deployed Endpoint
+
+N/A
+
+The application was containerized and tested locally using Docker Compose. No public deployment was performed as part of this task.
+
+---
+
+# Conclusion
+
+The Notes API application was successfully containerized using Docker and Docker Compose. The implementation includes a multi-stage Docker build, PostgreSQL containerization, health checks, persistent volumes, and documentation. The final solution satisfies all task requirements and can be reproduced using the provided configuration and commands.
