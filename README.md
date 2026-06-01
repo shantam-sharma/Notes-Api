@@ -56,7 +56,8 @@ This project was built to learn and implement real-world backend development con
 | bcrypt         | Password Hashing       |
 | golang-migrate | Database Migrations    |
 | godotenv       | Environment Management |
-
+| Docker         | Containerization       |
+| Docker Compose | Service Orchestration  |
 ---
 
 ## Architecture
@@ -112,6 +113,9 @@ Notes-Api/
 ├── cmd/
 │   └── main.go
 │
+├── docs/
+│   └── screenshots/
+|
 ├── internal/
 │   ├── database/
 │   ├── handlers/
@@ -122,6 +126,11 @@ Notes-Api/
 │   └── utils/
 │
 ├── migrations/
+|
+|
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
 │
 ├── .env
 ├── go.mod
@@ -209,7 +218,7 @@ GET /notes?page=1&limit=10
 Create a `.env` file:
 
 ```env
-DB_URL=<postgres-connection-string>
+DATABASE_URL==<postgres-connection-string>
 JWT_SECRET=<jwt-secret>
 ```
 
@@ -235,7 +244,7 @@ go mod tidy
 Create a `.env` file and add:
 
 ```env
-DB_URL=<postgres-connection-string>
+DATABASE_URL=<postgres-connection-string>
 JWT_SECRET=<jwt-secret>
 ```
 
@@ -290,23 +299,103 @@ This project demonstrates:
 * Environment Configuration
 
 ---
+## Docker Deployment
 
-## Future Improvements
+### Build Image
 
-* Docker
-* Docker Compose
-* Unit Tests
-* Integration Tests
-* Refresh Tokens
-* Structured Logging
-* CI/CD Pipeline
+```bash
+docker build -t notes-api:multistage .
+```
+
+### Run With Docker Compose
+
+```bash
+docker compose up
+```
+
+### Stop Containers
+
+```bash
+docker compose down
+```
+
+### Rebuild Containers
+
+```bash
+docker compose build --no-cache
+docker compose up
+```
+
+### Services
+
+| Service    | Port |
+| ---------- | ---- |
+| Notes API  | 8080 |
+| PostgreSQL | 5433 |
+
+### Docker Architecture
+
+```text
+Client
+   │
+   ▼
+Notes API Container
+   │
+   ▼
+PostgreSQL Container
+```
+
+### Docker Features
+
+* Multi-stage Docker build
+* PostgreSQL container
+* Docker Compose orchestration
+* Persistent database volumes
+* Health checks
+* Container networking
+
+---
+## Screenshots
+
+### Running Containers
+
+![Docker Compose](docs/screenshots/docker-compose-up.png)
+
+### API Endpoint Test
+
+![API Endpoint](docs/screenshots/api-endpoint-test.png)
 
 ---
 
-## Version
+## Future Improvements
 
-Current Release:
+* Unit Tests
+* Integration Tests
+* Refresh Token Support
+* Structured Logging
+* GitHub Actions CI/CD
+* Terraform Infrastructure as Code
+* Prometheus & Grafana Monitoring
 
-```text
-v1.0.0
-```
+---
+
+## Releases
+
+### v1.0.0
+
+* JWT Authentication
+* CRUD Notes API
+* Pagination
+* Database Migrations
+* Layered Architecture
+
+### v1.1.0 — Dockerized Deployment
+
+* Docker Containerization
+* Multi-stage Docker Build
+* Docker Compose
+* PostgreSQL Container
+* Health Checks
+* Persistent Volumes
+
+

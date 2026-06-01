@@ -7,5 +7,9 @@
 
 tmp
 *.log
+
 vendor
+
 README.md
+
+docker-compose.yml
