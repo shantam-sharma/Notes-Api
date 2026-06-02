@@ -1,5 +1,7 @@
 # Notes API
 
+![CI Pipeline](https://github.com/shantam-sharma/Notes-Api/actions/workflows/ci.yml/badge.svg)
+
 A RESTful Notes API built with **Go**, **PostgreSQL**, and **JWT Authentication** following a layered backend architecture.
 
 This project was built to learn and implement real-world backend development concepts including authentication, authorization, database design, middleware, pagination, migrations, and clean architecture patterns.
