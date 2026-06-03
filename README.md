@@ -7,7 +7,18 @@ A RESTful Notes API built with **Go**, **PostgreSQL**, and **JWT Authentication*
 This project was built to learn and implement real-world backend development concepts including authentication, authorization, database design, middleware, pagination, migrations, and clean architecture patterns.
 
 ---
+## Quick Start
 
+```bash
+git clone https://github.com/shantam-sharma/Notes-Api.git
+cd Notes-Api
+docker compose up
+API Available At:
+```
+```text
+http://localhost:8080
+```
+---
 ## Features
 
 ### Authentication
@@ -44,6 +55,10 @@ This project was built to learn and implement real-world backend development con
 * Structured JSON Responses
 * Layered Architecture
 * Environment Variable Configuration
+* Docker Containerization
+* CI/CD with GitHub Actions
+* Docker Hub Image Publishing
+* Terraform Infrastructure as Code Example
 
 ---
 
@@ -60,6 +75,10 @@ This project was built to learn and implement real-world backend development con
 | godotenv       | Environment Management |
 | Docker         | Containerization       |
 | Docker Compose | Service Orchestration  |
+| Terraform      | Infrastructure as Code |
+| Docker Hub     | Container Registry     |
+| GitHub Actions | CI/CD Automation       |
+
 ---
 
 ## Architecture
@@ -79,7 +98,23 @@ Repositories
    ▼
 PostgreSQL
 ```
-
+## Infrastructure Architecture
+```
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions
+    │
+    ▼
+Docker Build
+    │
+    ▼
+Docker Hub
+```
+---
 ### Layer Responsibilities
 
 #### Handlers
@@ -129,6 +164,11 @@ Notes-Api/
 │
 ├── migrations/
 |
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── README.md
 |
 ├── Dockerfile
 ├── docker-compose.yml
@@ -220,12 +260,64 @@ GET /notes?page=1&limit=10
 Create a `.env` file:
 
 ```env
-DATABASE_URL==<postgres-connection-string>
+DATABASE_URL=<postgres-connection-string>
 JWT_SECRET=<jwt-secret>
 ```
 
 ---
 
+## DevOps & Infrastructure
+
+This repository also includes DevOps and Infrastructure as Code examples built while extending the Notes API project.
+
+### Containerization
+
+- Docker
+- Docker Compose
+- Multi-stage Docker Builds
+- PostgreSQL Container
+
+## CI/CD Pipeline
+
+The project includes a GitHub Actions workflow that:
+
+- Builds the application
+- Runs tests
+- Validates Docker builds
+- Publishes Docker images to Docker Hub
+
+Workflow File:
+
+.github/workflows/ci.yml
+
+### Docker Image
+
+Docker Hub Repository:
+
+https://hub.docker.com/r/aayushshantam/notes-api
+---
+### Terraform
+
+The repository contains Infrastructure as Code examples using Terraform.
+
+Concepts demonstrated:
+
+- Providers
+- Resources
+- Variables
+- Outputs
+- State Management
+
+Terraform Commands:
+
+```bash
+cd terraform
+
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+```
 ## Running Locally
 
 ### Clone Repository
@@ -366,18 +458,6 @@ PostgreSQL Container
 ### API Endpoint Test
 
 ![API Endpoint](docs/screenshots/api-endpoint-test.png)
-
----
-
-## Future Improvements
-
-* Unit Tests
-* Integration Tests
-* Refresh Token Support
-* Structured Logging
-* GitHub Actions CI/CD
-* Terraform Infrastructure as Code
-* Prometheus & Grafana Monitoring
 
 ---
 
